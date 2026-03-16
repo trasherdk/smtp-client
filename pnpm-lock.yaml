@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@trasherdk/line-buffer':
-        specifier: 1.0.0
-        version: 1.0.0
       '@trasherdk/promised-timeout':
         specifier: 1.0.0
         version: 1.0.0
@@ -18,6 +15,9 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
     devDependencies:
+      '@trasherdk/line-buffer':
+        specifier: 1.0.0
+        version: 1.0.0
       '@types/node':
         specifier: ^25.5.0
         version: 25.5.0
