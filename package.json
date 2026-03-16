@@ -1,23 +1,30 @@
 {
-  "name": "smtp-client",
-  "version": "0.4.0",
-  "description": "Low level SMTP communication layer.",
-  "main": "./src/index.js",
-  "types": "./types.d.ts",
-  "scripts": {
-    "test": "ava"
+  "name": "@trasherdk/smtp-client",
+  "version": "0.9.1",
+  "packageManager": "pnpm@10.32.1",
+  "type": "module",
+  "description": "Simple, promisified, protocol-based SMTP client.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
-  "ava": {
-    "files": [
-      "./tests/*.js",
-      "./tests/**/*.js"
-    ],
-    "concurrency": 1,
-    "failFast": true
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xpepermint/smtp-client.git"
+    "url": "git+https://github.com/trasherdk/smtp-client.git"
   },
   "keywords": [
     "smtp",
@@ -27,7 +34,6 @@
     "session",
     "mail",
     "email",
-    "client",
     "communication",
     "connection",
     "send",
@@ -37,18 +43,22 @@
     "stream"
   ],
   "bugs": {
-    "url": "https://github.com/xpepermint/smtp-client/issues"
+    "url": "https://github.com/trasherdk/smtp-client/issues"
   },
-  "homepage": "https://github.com/xpepermint/smtp-client#readme",
+  "homepage": "https://github.com/trasherdk/smtp-client#readme",
   "author": "Kristijan Sedlak (Xpepermint)",
+  "contributors": [
+    "trasherdk"
+  ],
   "license": "MIT",
-  "devDependencies": {
-    "@types/node": "14.0.27",
-    "ava": "3.11.0",
-    "line-buffer": "0.1.4"
-  },
   "dependencies": {
-    "promised-timeout": "0.5.1",
-    "smtp-channel": "0.2.3"
+    "@trasherdk/promised-timeout": "1.0.0",
+    "@trasherdk/smtp-channel": "1.0.0"
+  },
+  "devDependencies": {
+    "@trasherdk/line-buffer": "1.0.0",
+    "@types/node": "^25.5.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   }
 }

@@ -1,48 +1,53 @@
-![Build Status](https://travis-ci.org/xpepermint/smtp-client.svg?branch=master)&nbsp;[![NPM Version](https://badge.fury.io/js/smtp-client.svg)](https://badge.fury.io/js/smtp-client)&nbsp;[![Dependency Status](https://gemnasium.com/xpepermint/smtp-client.svg)](https://gemnasium.com/xpepermint/smtp-client)
-
-# smtp-client
+# @trasherdk/smtp-client
 
 > Simple, promisified, protocol-based SMTP client for Node.js.
 
-This is an open source [npm](http://npmjs.com) package from [Node.js](http://nodejs.org). The source code is available on [GitHub](https://github.com/xpepermint/smtp-client) where you can also find our [issue tracker](https://github.com/xpepermint/smtp-client/issues).
+This is a maintained fork of [smtp-client](https://github.com/xpepermint/smtp-client) by Kristijan Sedlak, which is no longer actively maintained. This fork has been modernized with TypeScript strict mode, ESM-only output, and current tooling.
 
 ## Related Projects
 
-* [smtp-channel](https://github.com/xpepermint/smtp-channel): Low level SMTP communication layer.
-* [smtp-connection](https://github.com/nodemailer/smtp-connection): SMTP client for node.js.
+- [smtp-channel](https://github.com/trasherdk/smtp-channel): Low level SMTP communication layer.
+- [smtp-connection](https://github.com/nodemailer/smtp-connection): SMTP client for node.js.
+
+## Changes from the original
+
+- Rewritten as strict TypeScript
+- ESM-only (no CommonJS)
+- Vitest instead of AVA
+- Node.js >= 22
 
 ## Install
 
 ```
-$ npm install --save smtp-client
+pnpm add @trasherdk/smtp-client
 ```
 
 ## Example
 
-```js
-import {SMTPClient} from 'smtp-client';
+```ts
+import { SMTPClient } from "@trasherdk/smtp-client";
 
-let s = new SMTPClient({
-  host: 'mx.domain.com',
-  port: 25
+const s = new SMTPClient({
+  host: "mx.domain.com",
+  port: 25,
 });
 
-(async function() {
-  await s.connect();
-  await s.greet({hostname: 'mx.domain.com'}); // runs EHLO command or HELO as a fallback
-  await s.authPlain({username: 'john', password: 'secret'}); // authenticates a user
-  await s.mail({from: 'from@sender.com'}); // runs MAIL FROM command
-  await s.rcpt({to: 'to@recipient.com'}); // runs RCPT TO command (run this multiple times to add more recii)
-  await s.data('mail source'); // runs DATA command and streams email source (e.x. smtpClient.data(`Subject: title\r\nbody`))
-  await s.quit(); // runs QUIT command
-})().catch(console.error);
+await s.connect();
+await s.greet({ hostname: "mx.domain.com" }); // EHLO or HELO as fallback
+await s.authPlain({ username: "john", password: "secret" });
+await s.mail({ from: "from@sender.com" });
+await s.rcpt({ to: "to@recipient.com" });
+await s.data("Subject: title\r\n\r\nbody");
+await s.quit();
 ```
+
+See [PUBLISH.md](PUBLISH.md) for release and publish instructions.
 
 ## API
 
 **SMTPClient(options)**
 
-> The core SMTP client class. This class extends the [SMTPChannel](https://github.com/xpepermint/smtp-channel). The options are sent directly to the  [net.connect](https://nodejs.org/api/net.html#net_net_connect_options_connectlistener) or  [tls.connect](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback) method. Custom available options are listed below.
+> The core SMTP client class. This class extends the [SMTPChannel](https://github.com/trasherdk/smtp-channel). The options are sent directly to the  [net.connect](https://nodejs.org/api/net.html#net_net_connect_options_connectlistener) or  [tls.connect](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback) method. Custom available options are listed below.
 
 | Option | Type | Required | Default | Description
 |--------|------|----------|---------|------------
