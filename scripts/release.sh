@@ -18,11 +18,6 @@ while [[ $# -ne 0 ]]; do
 done
 
 ORIG_BRANCH="$(git branch --show-current)"
-if [[ "$ORIG_BRANCH" != "master" ]]; then
-  echo "> Branch is $ORIG_BRANCH; checking out master and merging..."
-  git checkout master
-  git merge "$ORIG_BRANCH"
-fi
 
 echo "> Building..."
 pnpm build
@@ -38,15 +33,26 @@ else
 fi
 
 if [[ -z "$NO_PUSH" ]]; then
-  echo "> Pushing..."
+  echo "> Pushing $ORIG_BRANCH..."
+  git push origin "$ORIG_BRANCH"
+
+  if [[ "$ORIG_BRANCH" != "master" ]]; then
+    echo "> Checking out master and merging $ORIG_BRANCH..."
+    git checkout master
+    git merge "$ORIG_BRANCH"
+    echo "> Pushing master..."
+    git push origin master
+  fi
+
   VERSION="$(node -p "require('./package.json').version")"
   TAG="v$VERSION"
-  git push
-  if git rev-parse "$TAG" &>/dev/null; then
-    git push origin "$TAG" --force
-  else
-    git push --tags
-  fi
+  echo "> Tagging $TAG..."
+  git tag -f "$TAG"
+  git push origin "$TAG" --force
+
+  echo "> Returning to $ORIG_BRANCH..."
+  git checkout "$ORIG_BRANCH"
+
   echo "Done. CI will publish to npm on tag push."
 else
   echo "Done. Run 'git push --follow-tags' when ready."
