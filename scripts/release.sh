@@ -1,25 +1,27 @@
 #!/usr/bin/env bash
 set -e
 
-# Release script: bump version, build, test, commit, tag, push.
+# Release script: bump version (or re-tag current), build, test, commit, tag, push.
 # Usage: pnpm release [patch|minor|major] [--no-push]
 # Or: ./scripts/release.sh patch [--no-push]
+# No bump level = re-release current version (force tag).
 
-BUMP="${1:-patch}"
+BUMP=""
 NO_PUSH=""
-[[ "${2:-}" == "--no-push" || "${1:-}" == "--no-push" ]] && NO_PUSH=1
-[[ "${BUMP}" == "--no-push" ]] && BUMP="patch"
+while [[ $# -ne 0 ]]; do
+  case "$1" in
+    patch|minor|major) BUMP="$1" ;;
+    --no-push) NO_PUSH=1 ;;
+    *) ;;  # first release or re-release; no bump
+  esac
+  shift
+done
 
-case "$BUMP" in
-  patch|minor|major) ;;
-  *) echo "Usage: pnpm release [patch|minor|major] [--no-push]"; exit 1 ;;
-esac
-
-BRANCH="$(git branch --show-current)"
-if [[ "$BRANCH" != "master" ]]; then
-  echo "> Branch is $BRANCH; checking out master and merging..."
+ORIG_BRANCH="$(git branch --show-current)"
+if [[ "$ORIG_BRANCH" != "master" ]]; then
+  echo "> Branch is $ORIG_BRANCH; checking out master and merging..."
   git checkout master
-  git merge "$BRANCH"
+  git merge "$ORIG_BRANCH"
 fi
 
 echo "> Building..."
@@ -28,8 +30,12 @@ pnpm build
 echo "> Testing..."
 pnpm test
 
-echo "> Bumping version ($BUMP)..."
-pnpm version "$BUMP"
+if [[ -n "$BUMP" ]]; then
+  echo "> Bumping version ($BUMP)..."
+  pnpm version "$BUMP"
+else
+  echo "> Re-release: no version bump"
+fi
 
 if [[ -z "$NO_PUSH" ]]; then
   echo "> Pushing..."
