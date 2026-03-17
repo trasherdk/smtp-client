@@ -25,23 +25,30 @@ pnpm add @trasherdk/smtp-client
 ## Example
 
 ```ts
-import { SMTPClient } from "@trasherdk/smtp-client";
+import { SMTPClient, SMTPResponseError } from "@trasherdk/smtp-client";
 
 const s = new SMTPClient({
   host: "mx.domain.com",
   port: 25,
 });
 
-await s.connect();
-await s.greet({ hostname: "mx.domain.com" }); // EHLO or HELO as fallback
-await s.authPlain({ username: "john", password: "secret" });
-await s.mail({ from: "from@sender.com" });
-await s.rcpt({ to: "to@recipient.com" });
-await s.data("Subject: title\r\n\r\nbody");
-await s.quit();
+try {
+  await s.connect();
+  await s.greet({ hostname: "mx.domain.com" }); // EHLO or HELO as fallback
+  await s.authPlain({ username: "john", password: "secret" });
+  await s.mail({ from: "from@sender.com" });
+  await s.rcpt({ to: "to@recipient.com" });
+  await s.data("Subject: title\r\n\r\nbody");
+  await s.quit();
+} catch (err) {
+  if (err instanceof SMTPResponseError) {
+    console.error("SMTP error:", err.code, err.message);
+  } else {
+    console.error("Error:", err);
+  }
+  await s.close().catch(() => {}); // ensure connection is closed
+}
 ```
-
-See [PUBLISH.md](PUBLISH.md) for release and publish instructions.
 
 ## API
 
