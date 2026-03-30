@@ -24,7 +24,7 @@ export class SMTPClient {
   parseEnhancedReplyCode(line: string): string | null
   parseReplyText(line: string): string
   noop(options?: TimeoutOptions): Promise<void>
-  secure(options?: TimeoutOptions): Promise<void>
+  secure(options?: SecureOptions): Promise<void>
 }
 
 export interface TimeoutOptions {
@@ -69,4 +69,10 @@ export interface RcptOptions extends TimeoutOptions {
 
 export interface DataOptions extends TimeoutOptions {
   sourceSize?: number
+}
+
+export interface SecureOptions extends TimeoutOptions {
+  rejectUnauthorized?: boolean
+  ca?: string | Buffer | ArrayBufferView | ArrayBuffer | (Buffer | string)[]
+  servername?: string
 }

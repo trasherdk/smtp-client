@@ -39,6 +39,16 @@ export interface AuthOptions {
   timeout?: number;
 }
 
+export interface SecureOptions {
+  timeout?: number;
+  /** When false, accepts self-signed or incomplete certificate chains (e.g. dev servers). */
+  rejectUnauthorized?: boolean;
+  /** Trusted CA(s) in PEM form — same as Node `tls.connect` `ca` (e.g. your server’s cert for self-signed setups). */
+  ca?: string | Buffer | ArrayBufferView | ArrayBuffer | (Buffer | string)[];
+  /** SNI server name; set when connecting by IP or when cert name differs from `host`. */
+  servername?: string;
+}
+
 /**
  * Simple, promisified, protocol-based SMTP client extending SMTPChannel.
  */
@@ -257,7 +267,12 @@ export class SMTPClient extends SMTPChannel {
       });
   }
 
-  secure({ timeout: time = 0 }: { timeout?: number } = {}): Promise<void> {
+  secure({
+    timeout: time = 0,
+    rejectUnauthorized,
+    ca,
+    servername,
+  }: SecureOptions = {}): Promise<void> {
     const isPossible = this.hasExtension("STARTTLS");
     if (!isPossible) {
       throw new Error("SMTP server does not support TLS");
@@ -274,7 +289,12 @@ export class SMTPClient extends SMTPChannel {
         if (code && code.charAt(0) !== "2") {
           throw this._createSMTPResponseError(lines);
         }
-        return this.negotiateTLS({ timeout: time });
+        return this.negotiateTLS({
+          timeout: time,
+          ...(rejectUnauthorized !== undefined ? { rejectUnauthorized } : {}),
+          ...(ca !== undefined ? { ca } : {}),
+          ...(servername !== undefined ? { servername } : {}),
+        });
       })
       .then(() => {
         this._extensions = [];
